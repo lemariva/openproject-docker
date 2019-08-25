@@ -1,0 +1,30 @@
+version: "3"
+services:
+  openproject:
+    image: openproject/community:latest
+    environment:
+      EMAIL_DELIVERY_METHOD: smtp
+      SMTP_ADDRESS: smtp.sendgrid.net
+      SMTP_PORT: 587
+      SMTP_DOMAIN: "your.domain.com"
+      SMTP_AUTHENTICATION: login
+      SMTP_ENABLE_STARTTLS_AUTO: "true"
+      SMTP_USER_NAME: "apikey"
+      SMTP_PASSWORD: "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"
+    volumes:
+      - ./openproject/pgdata:/var/openproject/pgdata
+      - ./openproject/logs:/var/log/supervisor
+      - ./openproject/static:/var/openproject/assets
+    expose:
+      - "8080"
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/cache/:/etc/nginx/cache
+      - ./nginx/ssl:/etc/nginx/ssl
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - openproject
